@@ -5,15 +5,14 @@ name: Docker
 # separate terms of service, privacy policy, and support
 # documentation.
 
+# Publishes and signs the scorer image only when a version tag (v1.2.3) is pushed,
+# or when started by hand. Ordinary pushes are built and tested by ci.yml and
+# publish nothing.
 on:
-  schedule:
-    - cron: '40 20 * * *'
   push:
-    branches: [ "main" ]
     # Publish semver tags as releases.
     tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -76,6 +75,7 @@ jobs:
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
         with:
           context: .
+          file: deploy/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
