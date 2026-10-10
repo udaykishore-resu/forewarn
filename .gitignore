@@ -7,6 +7,7 @@ __pycache__/
 .venv/
 .DS_Store
 *.txt
+!requirements.txt
 
 # deployment inputs that must not be committed by accident
 deploy/k8s/bundle.json
