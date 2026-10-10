@@ -1,9 +1,5 @@
 # Forewarn
 
-**Pre-delinquency early warning, bankruptcy scoring and action recommendation for credit card portfolios, built to run entirely inside a bank's own cloud account and to arrive with its own validation evidence.**
-
-Topics: `credit-risk` `early-warning` `bankruptcy-prediction` `model-risk-management` `explainable-ml` `uplift-modeling` `fair-lending` `golang` `python` `lightgbm` `kubernetes` `fintech`
-
 > **Status: pre-pilot.** Everything works end to end and is tested, on **simulated** customers. No number below is evidence about a real portfolio. Scope is United States rules only. See [what is missing](docs/limitations-and-roadmap.md).
 
 ## What it does
