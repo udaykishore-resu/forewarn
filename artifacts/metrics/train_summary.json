@@ -1,0 +1,86 @@
+{
+  "features": [
+    "payroll_gap_days",
+    "payroll_amt_ratio_3m",
+    "payroll_missed_cycles_3m",
+    "inflow_ratio_3m",
+    "transfer_in_share_3m",
+    "buffer_days",
+    "buffer_days_change_6m",
+    "min_balance_ratio_3m",
+    "od_count_3m",
+    "od_months_6m",
+    "neg_days_3m",
+    "stl_months_6m",
+    "ext_debt_pay_ratio_3m",
+    "ext_debt_pay_change_3m",
+    "disc_spend_ratio_3m",
+    "utilization",
+    "util_change_3m",
+    "util_change_6m",
+    "pay_ratio_3m",
+    "pay_to_min_3m",
+    "min_pay_months_6m",
+    "pay_ratio_drift",
+    "cash_adv_to_limit_3m",
+    "cash_adv_months_6m",
+    "late_fee_count_6m",
+    "card_spend_ratio_3m",
+    "max_cpd_12m"
+  ],
+  "alert_share": {
+    "delinquency": 0.05,
+    "bankruptcy": 0.02
+  },
+  "rows": {
+    "train": 1284169,
+    "valid": 347246,
+    "test": 497767
+  },
+  "delinquency": {
+    "trees": 1428,
+    "terms": 24,
+    "calibration": [
+      -0.07265335409659644,
+      0.979533433590701
+    ],
+    "alert_threshold": 0.09959182496795461,
+    "champion_coefficients": {
+      "utilization": 0.9772,
+      "pay_ratio_3m": 0.0947,
+      "late_fee_count_6m": 0.1252,
+      "max_cpd_12m": 0.0794,
+      "min_pay_months_6m": 0.0234,
+      "cash_adv_months_6m": 0.0347
+    },
+    "benchmark_trees": 278,
+    "test_auc_p_delinquency": 0.9030752743048986,
+    "test_auc_champion_delinquency": 0.8275852738142542,
+    "test_auc_card_only_delinquency": 0.8457947181854635,
+    "test_auc_benchmark_delinquency": 0.9099881063306829,
+    "test_auc_restricted_delinquency": 0.9030752743048986
+  },
+  "bankruptcy": {
+    "trees": 1824,
+    "terms": 20,
+    "calibration": [
+      -0.27703183586937064,
+      0.9238948670876432
+    ],
+    "alert_threshold": 0.038568335821861,
+    "champion_coefficients": {
+      "utilization": 1.0292,
+      "pay_ratio_3m": 0.1876,
+      "late_fee_count_6m": -0.1336,
+      "max_cpd_12m": -0.0372,
+      "min_pay_months_6m": 0.2296,
+      "cash_adv_months_6m": 0.1471
+    },
+    "benchmark_trees": 240,
+    "test_auc_p_bankruptcy": 0.8855216391939289,
+    "test_auc_champion_bankruptcy": 0.8383377521998701,
+    "test_auc_card_only_bankruptcy": 0.8495510081110152,
+    "test_auc_benchmark_bankruptcy": 0.9047002236038898,
+    "test_auc_restricted_bankruptcy": 0.8862664369354996
+  }
+}

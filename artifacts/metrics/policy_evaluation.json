@@ -1,0 +1,248 @@
+{
+  "n_decisions": 35123,
+  "horizon_months": 18,
+  "value_definition": "revenue (interest, interchange, cash-advance fees; penalty fees excluded) minus credit loss minus action cost, per pilot account",
+  "arms": {
+    "none": {
+      "n": 6991,
+      "mean_value": 642.8735960520669,
+      "se": 32.1838978445219,
+      "loss": 731.1368073237019,
+      "revenue": 1374.0104033757689,
+      "bad_rate": 0.10184522958088972
+    },
+    "due_date_change": {
+      "n": 7121,
+      "mean_value": 689.9995590506952,
+      "se": 28.501204503580496,
+      "loss": 586.2429532369049,
+      "revenue": 1281.2425122876,
+      "bad_rate": 0.08875157983429294
+    },
+    "hardship_plan": {
+      "n": 7039,
+      "mean_value": 369.791432021594,
+      "se": 25.419144271234423,
+      "loss": 487.61415257849126,
+      "revenue": 867.4055846000853,
+      "bad_rate": 0.07202727660179002
+    },
+    "limit_decrease": {
+      "n": 6913,
+      "mean_value": 495.2164009836539,
+      "se": 27.182064950538987,
+      "loss": 598.5205410096919,
+      "revenue": 1095.736941993346,
+      "bad_rate": 0.11312020830319687
+    },
+    "outreach_call": {
+      "n": 7059,
+      "mean_value": 637.3387618642868,
+      "se": 30.126057537906355,
+      "loss": 654.4200297492563,
+      "revenue": 1306.7587916135428,
+      "bad_rate": 0.0933559994333475
+    }
+  },
+  "policies": {
+    "no_action": {
+      "value": 639.798609173476,
+      "gain_vs_no_action": 0.0,
+      "gain_ci95": [
+        0.0,
+        0.0
+      ],
+      "p_gain_le_0": 1.0,
+      "action_mix": {
+        "none": 1.0,
+        "due_date_change": 0.0,
+        "hardship_plan": 0.0,
+        "limit_decrease": 0.0,
+        "outreach_call": 0.0
+      }
+    },
+    "always_due_date_change": {
+      "value": 679.5753138968767,
+      "gain_vs_no_action": 39.77670472340062,
+      "gain_ci95": [
+        -19.552362767986793,
+        103.16280432337781
+      ],
+      "p_gain_le_0": 0.105,
+      "action_mix": {
+        "none": 0.3953,
+        "due_date_change": 0.6047,
+        "hardship_plan": 0.0,
+        "limit_decrease": 0.0,
+        "outreach_call": 0.0
+      }
+    },
+    "always_hardship_plan": {
+      "value": 370.54448794237396,
+      "gain_vs_no_action": -269.25412123110215,
+      "gain_ci95": [
+        -343.42280884320814,
+        -186.97364308999803
+      ],
+      "p_gain_le_0": 1.0,
+      "action_mix": {
+        "none": 0.0001,
+        "due_date_change": 0.0,
+        "hardship_plan": 0.9999,
+        "limit_decrease": 0.0,
+        "outreach_call": 0.0
+      }
+    },
+    "always_limit_decrease": {
+      "value": 510.4504057170515,
+      "gain_vs_no_action": -129.34820345642459,
+      "gain_ci95": [
+        -205.62907040970308,
+        -56.08042098482482
+      ],
+      "p_gain_le_0": 1.0,
+      "action_mix": {
+        "none": 0.1188,
+        "due_date_change": 0.0,
+        "hardship_plan": 0.0,
+        "limit_decrease": 0.8812,
+        "outreach_call": 0.0
+      }
+    },
+    "always_outreach_call": {
+      "value": 640.4598582125673,
+      "gain_vs_no_action": 0.6612490390911686,
+      "gain_ci95": [
+        -89.40818281467985,
+        97.41995775560167
+      ],
+      "p_gain_le_0": 0.498,
+      "action_mix": {
+        "none": 0.0,
+        "due_date_change": 0.0,
+        "hardship_plan": 0.0,
+        "limit_decrease": 0.0,
+        "outreach_call": 1.0
+      }
+    },
+    "expert_rules": {
+      "value": 675.150042707058,
+      "gain_vs_no_action": 35.35143353358197,
+      "gain_ci95": [
+        -28.082268919226728,
+        99.13132445263781
+      ],
+      "p_gain_le_0": 0.118,
+      "action_mix": {
+        "none": 0.6327,
+        "due_date_change": 0.1144,
+        "hardship_plan": 0.0689,
+        "limit_decrease": 0.1342,
+        "outreach_call": 0.0497
+      }
+    },
+    "forewarn_policy": {
+      "value": 695.6440964610085,
+      "gain_vs_no_action": 55.84548728753238,
+      "gain_ci95": [
+        -22.10043998946558,
+        127.02709285937988
+      ],
+      "p_gain_le_0": 0.076,
+      "action_mix": {
+        "none": 0.5122,
+        "due_date_change": 0.1629,
+        "hardship_plan": 0.0369,
+        "limit_decrease": 0.0227,
+        "outreach_call": 0.2653
+      }
+    }
+  },
+  "params": {
+    "base": {
+      "rounds": 400,
+      "learning_rate": 0.05,
+      "min_leaf": 300,
+      "reg_lambda": 10.0
+    },
+    "arm": {
+      "rounds": 120,
+      "learning_rate": 0.05,
+      "min_leaf": 250,
+      "reg_lambda": 50.0
+    },
+    "min_gain": 50.0
+  },
+  "forewarn_policy_by_action": {
+    "due_date_change": {
+      "share_of_pilot": 0.162913190786664,
+      "n_treated_as_recommended": 1160,
+      "n_control": 1174,
+      "value_if_treated": 1237.2792327586208,
+      "value_if_no_action": 923.0052896081771,
+      "difference": 314.27394315044364,
+      "difference_se": 137.81774798670818,
+      "mean_predicted_gain": 329.58961523814
+    },
+    "hardship_plan": {
+      "share_of_pilot": 0.03689889815790223,
+      "n_treated_as_recommended": 246,
+      "n_control": 272,
+      "value_if_treated": -453.46910569105694,
+      "value_if_no_action": -817.5283088235294,
+      "difference": 364.0592031324725,
+      "difference_se": 253.24527224833116,
+      "mean_predicted_gain": 329.06137728120467
+    },
+    "limit_decrease": {
+      "share_of_pilot": 0.022691683512228455,
+      "n_treated_as_recommended": 149,
+      "n_control": 157,
+      "value_if_treated": 442.9473825503358,
+      "value_if_no_action": 1443.1411464968153,
+      "difference": -1000.1937639464795,
+      "difference_se": 587.9875514482271,
+      "mean_predicted_gain": 269.88964893454005
+    },
+    "outreach_call": {
+      "share_of_pilot": 0.26532471599806395,
+      "n_treated_as_recommended": 1894,
+      "n_control": 1852,
+      "value_if_treated": 420.2791657866948,
+      "value_if_no_action": 380.98948704103674,
+      "difference": 39.28967874565808,
+      "difference_se": 84.1797814645194,
+      "mean_predicted_gain": 180.60276674641182
+    }
+  },
+  "shipped_rule": {
+    "n_decisions": 6484,
+    "decision_months": [
+      27,
+      35
+    ],
+    "share_alerted": 0.17504626773596546,
+    "share_alerted_and_in_support": 0.17196175200493521,
+    "share_treated": 0.11243059839605182,
+    "action_mix": {
+      "none": 0.8876,
+      "due_date_change": 0.0227,
+      "hardship_plan": 0.0224,
+      "limit_decrease": 0.011,
+      "outreach_call": 0.0564
+    },
+    "gain_vs_no_action": -14.131091918568801,
+    "gain_ci95": [
+      -126.58095504318324,
+      98.94144085441083
+    ],
+    "p_gain_le_0": 0.613,
+    "ungated_policy_same_accounts": {
+      "gain_vs_no_action": -20.270072486119695,
+      "gain_ci95": [
+        -179.6722117905614,
+        160.7519738972856
+      ]
+    }
+  }
+}

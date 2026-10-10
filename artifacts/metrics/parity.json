@@ -1,0 +1,11 @@
+{
+  "bundle_sha256": "a2fddd3ce02b00920905b0cdf7823bf3b7a1e44f190e84b8fc6a6812a013919c",
+  "cases": 400,
+  "passed": 400,
+  "failed": 0,
+  "max_abs_diff_logit": 0,
+  "max_abs_diff_probability": 1.1102230246251565e-16,
+  "max_abs_diff_gain": 0,
+  "tolerance": 1e-9,
+  "scorer_version": "0.1.0"
+}

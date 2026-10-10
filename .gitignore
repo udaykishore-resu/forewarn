@@ -1,0 +1,15 @@
+# generated data: rebuild with `make all`
+data/
+bin/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.DS_Store
+*.txt
+
+# deployment inputs that must not be committed by accident
+deploy/k8s/bundle.json
+*.tfstate
+*.tfstate.*
+.terraform/

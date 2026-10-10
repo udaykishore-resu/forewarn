@@ -1,0 +1,16 @@
+{
+  "bundle": "/home/claude/forewarn/artifacts/bundle/bundle.json",
+  "sha256": "a2fddd3ce02b00920905b0cdf7823bf3b7a1e44f190e84b8fc6a6812a013919c",
+  "features": 29,
+  "parity_cases": 400,
+  "bytes": 67547,
+  "test_alert_rate": 0.05839289446483133,
+  "alerted_in_pilot_support": 0.81899660039147,
+  "alerted_action_mix": {
+    "none": 0.4673,
+    "due_date_change": 0.3386,
+    "outreach_call": 0.0769,
+    "hardship_plan": 0.0688,
+    "limit_decrease": 0.0483
+  }
+}

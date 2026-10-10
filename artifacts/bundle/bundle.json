@@ -1,0 +1,3003 @@
+{
+ "schema_version": 1,
+ "name": "forewarn",
+ "version": "0.1.0",
+ "created_at": "2026-10-10T10:05:48+00:00",
+ "data_source": "synthetic",
+ "training": {
+  "rows": {
+   "train": 1284169,
+   "valid": 347246,
+   "test": 497767
+  },
+  "features_sha256": "85dab98114e863560487c24a584bf949b3406f45ab2d9e03c2e4bf1c7ca128d2",
+  "snapshot_months": {
+   "train": [
+    8,
+    26
+   ],
+   "valid": [
+    27,
+    32
+   ],
+   "test": [
+    39,
+    47
+   ]
+  },
+  "targets": {
+   "delinquency": "60 or more days past due within 6 months, account current at snapshot",
+   "bankruptcy": "bankruptcy filing within 6 months, account current at snapshot"
+  }
+ },
+ "features": [
+  {
+   "name": "payroll_gap_days",
+   "group": "payroll",
+   "source": "deposit",
+   "monotone": 1,
+   "reason_code": "D01",
+   "reason_text": "Length of time since the last regular payroll deposit",
+   "description": "Days since the most recent payroll credit beyond a normal monthly cycle: max(days - 31, 0). Zero for anyone paid within the last 31 days, so it does not move with month length. Missing when there is no payroll relationship or the last payroll is more than 120 days old.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "No regular payroll deposits on record with us",
+   "required": false
+  },
+  {
+   "name": "payroll_amt_ratio_3m",
+   "group": "payroll",
+   "source": "deposit",
+   "monotone": -1,
+   "reason_code": "D02",
+   "reason_text": "Decrease in regular payroll deposits",
+   "description": "Payroll credited in the last 3 months divided by the 3-month average of the 6 months before that.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "No regular payroll deposits on record with us",
+   "required": false
+  },
+  {
+   "name": "payroll_missed_cycles_3m",
+   "group": "payroll",
+   "source": "deposit",
+   "monotone": 1,
+   "reason_code": "D03",
+   "reason_text": "Expected payroll deposits not received",
+   "description": "Expected payroll count (from the prior 6 months) minus payroll credits received in the last 3 months.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "No regular payroll deposits on record with us",
+   "required": false
+  },
+  {
+   "name": "inflow_ratio_3m",
+   "group": "income",
+   "source": "deposit",
+   "monotone": -1,
+   "reason_code": "D04",
+   "reason_text": "Decrease in total income deposited to the account",
+   "description": "Income-like credits (payroll, benefits, other income) in the last 3 months versus the 6 months before. Uses the amount of income from all sources and never which source it came from.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "No regular income deposits on record with us",
+   "required": false
+  },
+  {
+   "name": "transfer_in_share_3m",
+   "group": "income",
+   "source": "deposit",
+   "monotone": 0,
+   "reason_code": "D05",
+   "reason_text": "Share of deposits arriving by transfer from other accounts",
+   "description": "External transfers in divided by all credits over 3 months.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "No regular income deposits on record with us",
+   "required": false
+  },
+  {
+   "name": "buffer_days",
+   "group": "buffer",
+   "source": "deposit",
+   "monotone": -1,
+   "reason_code": "D06",
+   "reason_text": "Deposit balance low relative to monthly spending",
+   "description": "Month-end balance divided by average daily outflow over the last 3 months.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "No deposit account history with us",
+   "required": false
+  },
+  {
+   "name": "buffer_days_change_6m",
+   "group": "buffer",
+   "source": "deposit",
+   "monotone": -1,
+   "reason_code": "D07",
+   "reason_text": "Decline in deposit balance relative to spending",
+   "description": "Change in buffer_days compared with 6 months earlier.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "No deposit account history with us",
+   "required": false
+  },
+  {
+   "name": "min_balance_ratio_3m",
+   "group": "buffer",
+   "source": "deposit",
+   "monotone": -1,
+   "reason_code": "D08",
+   "reason_text": "Low minimum deposit balance",
+   "description": "Lowest end-of-day balance in the last 3 months divided by average monthly outflow.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "No deposit account history with us",
+   "required": false
+  },
+  {
+   "name": "od_count_3m",
+   "group": "overdraft",
+   "source": "deposit",
+   "monotone": 1,
+   "reason_code": "D09",
+   "reason_text": "Number of recent overdrafts",
+   "description": "Overdraft fees assessed in the last 3 months.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "No deposit account history with us",
+   "required": false
+  },
+  {
+   "name": "od_months_6m",
+   "group": "overdraft",
+   "source": "deposit",
+   "monotone": 1,
+   "reason_code": "D10",
+   "reason_text": "Frequency of overdrafts",
+   "description": "Months with at least one overdraft in the last 6.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "No deposit account history with us",
+   "required": false
+  },
+  {
+   "name": "neg_days_3m",
+   "group": "overdraft",
+   "source": "deposit",
+   "monotone": 1,
+   "reason_code": "D11",
+   "reason_text": "Number of days with a negative deposit balance",
+   "description": "Days ending with a negative balance in the last 3 months.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "No deposit account history with us",
+   "required": false
+  },
+  {
+   "name": "stl_months_6m",
+   "group": "other_debt",
+   "source": "deposit",
+   "monotone": 1,
+   "reason_code": "D12",
+   "reason_text": "Recent short-term loan activity",
+   "description": "Months with proceeds from a short-term lender in the last 6.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "No deposit account history with us",
+   "required": false
+  },
+  {
+   "name": "ext_debt_pay_ratio_3m",
+   "group": "other_debt",
+   "source": "deposit",
+   "monotone": 1,
+   "reason_code": "D13",
+   "reason_text": "Payments to other lenders high relative to income deposited",
+   "description": "Payments to other lenders divided by income-like credits over 3 months.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "No deposit account history with us",
+   "required": false
+  },
+  {
+   "name": "ext_debt_pay_change_3m",
+   "group": "other_debt",
+   "source": "deposit",
+   "monotone": 0,
+   "reason_code": "D14",
+   "reason_text": "Change in payments to other lenders",
+   "description": "Payments to other lenders in the last 3 months versus the 6 months before.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "No deposit account history with us",
+   "required": false
+  },
+  {
+   "name": "disc_spend_ratio_3m",
+   "group": "spending",
+   "source": "card",
+   "monotone": 0,
+   "reason_code": "C01",
+   "reason_text": "Change in discretionary spending",
+   "description": "Discretionary spend (card and debit) in the last 3 months versus the 6 months before.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "Insufficient recent card activity to evaluate",
+   "required": false
+  },
+  {
+   "name": "utilization",
+   "group": "utilization",
+   "source": "card",
+   "monotone": 1,
+   "reason_code": "C02",
+   "reason_text": "Balance high relative to credit limit",
+   "description": "Statement balance divided by credit limit.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "Insufficient recent card activity to evaluate",
+   "required": true
+  },
+  {
+   "name": "util_change_3m",
+   "group": "utilization_trend",
+   "source": "card",
+   "monotone": 1,
+   "reason_code": "C03",
+   "reason_text": "Recent increase in balance relative to credit limit",
+   "description": "Utilization now minus utilization 3 months ago.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "Insufficient recent card activity to evaluate",
+   "required": true
+  },
+  {
+   "name": "util_change_6m",
+   "group": "utilization_trend",
+   "source": "card",
+   "monotone": 1,
+   "reason_code": "C04",
+   "reason_text": "Increase in balance relative to credit limit over six months",
+   "description": "Utilization now minus utilization 6 months ago.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "Insufficient recent card activity to evaluate",
+   "required": true
+  },
+  {
+   "name": "pay_ratio_3m",
+   "group": "payments",
+   "source": "card",
+   "monotone": -1,
+   "reason_code": "C05",
+   "reason_text": "Payments low relative to balance",
+   "description": "Payments over 3 months divided by the statement balances they were due on.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "Insufficient recent card activity to evaluate",
+   "required": true
+  },
+  {
+   "name": "pay_to_min_3m",
+   "group": "payments",
+   "source": "card",
+   "monotone": -1,
+   "reason_code": "C06",
+   "reason_text": "Payments close to the minimum amount due",
+   "description": "Payments over 3 months divided by minimum payments due.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "Insufficient recent card activity to evaluate",
+   "required": true
+  },
+  {
+   "name": "min_pay_months_6m",
+   "group": "payments",
+   "source": "card",
+   "monotone": 1,
+   "reason_code": "C07",
+   "reason_text": "Number of months only the minimum payment was made",
+   "description": "Months in the last 6 with a payment at or within 10% of the minimum while carrying a balance.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "Insufficient recent card activity to evaluate",
+   "required": true
+  },
+  {
+   "name": "pay_ratio_drift",
+   "group": "payment_trend",
+   "source": "card",
+   "monotone": -1,
+   "reason_code": "C08",
+   "reason_text": "Decrease in payment amounts",
+   "description": "Payment ratio over the last 3 months minus the payment ratio over the 6 months before.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "Insufficient recent card activity to evaluate",
+   "required": true
+  },
+  {
+   "name": "cash_adv_to_limit_3m",
+   "group": "cash_advance",
+   "source": "card",
+   "monotone": 1,
+   "reason_code": "C09",
+   "reason_text": "Amount of recent cash advances",
+   "description": "Cash advances in the last 3 months divided by credit limit.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "Insufficient recent card activity to evaluate",
+   "required": true
+  },
+  {
+   "name": "cash_adv_months_6m",
+   "group": "cash_advance",
+   "source": "card",
+   "monotone": 1,
+   "reason_code": "C10",
+   "reason_text": "Frequency of recent cash advances",
+   "description": "Months with a cash advance in the last 6.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "Insufficient recent card activity to evaluate",
+   "required": true
+  },
+  {
+   "name": "late_fee_count_6m",
+   "group": "late_payments",
+   "source": "card",
+   "monotone": 1,
+   "reason_code": "C11",
+   "reason_text": "Recent late payments",
+   "description": "Late fees assessed in the last 6 months.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "Insufficient recent card activity to evaluate",
+   "required": true
+  },
+  {
+   "name": "card_spend_ratio_3m",
+   "group": "spending",
+   "source": "card",
+   "monotone": 0,
+   "reason_code": "C12",
+   "reason_text": "Change in card spending",
+   "description": "Card purchases in the last 3 months versus the 6 months before.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "Insufficient recent card activity to evaluate",
+   "required": false
+  },
+  {
+   "name": "max_cpd_12m",
+   "group": "delinquency_history",
+   "source": "card",
+   "monotone": 1,
+   "reason_code": "C13",
+   "reason_text": "Past delinquency on this account",
+   "description": "Highest number of cycles past due in the last 12 months (the account is current at the snapshot).",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "Insufficient recent card activity to evaluate",
+   "required": true
+  },
+  {
+   "name": "statement_balance",
+   "group": "exposure",
+   "source": "card",
+   "monotone": 0,
+   "reason_code": "V01",
+   "reason_text": "",
+   "description": "Statement balance in dollars.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "Insufficient recent card activity to evaluate",
+   "required": true
+  },
+  {
+   "name": "open_to_buy",
+   "group": "exposure",
+   "source": "card",
+   "monotone": 0,
+   "reason_code": "V02",
+   "reason_text": "",
+   "description": "Credit limit minus statement balance in dollars.",
+   "status": "allowed",
+   "note": "",
+   "missing_text": "Insufficient recent card activity to evaluate",
+   "required": true
+  }
+ ],
+ "models": {
+  "delinquency": {
+   "name": "delinquency",
+   "link": "logit",
+   "intercept": -5.510022683452233,
+   "calibration": {
+    "a": -0.07265335409659644,
+    "b": 0.979533433590701
+   },
+   "terms": [
+    {
+     "feature": "payroll_gap_days",
+     "thresholds": [
+      1.5000000000000002,
+      13.500000000000002
+     ],
+     "values": [
+      -0.03627370022034701,
+      0.5391850439076395,
+      0.7400567338462186
+     ],
+     "missing": 0.035150225339132354
+    },
+    {
+     "feature": "payroll_amt_ratio_3m",
+     "thresholds": [
+      0.8333500027656556,
+      1.0538499951362612,
+      1.1672499775886538,
+      1.2500500082969668,
+      1.288950026035309
+     ],
+     "values": [
+      0.6174094445954711,
+      -0.005973256539471017,
+      -0.11136478999739656,
+      -0.3140818178830462,
+      -0.4362752303187402,
+      -0.5141458809005999
+     ],
+     "missing": -0.005973256539471019
+    },
+    {
+     "feature": "payroll_missed_cycles_3m",
+     "thresholds": [
+      1.0000000180025095e-35
+     ],
+     "values": [
+      -0.003175961766292767,
+      0.11558993667257009
+     ],
+     "missing": -0.003175961766292767
+    },
+    {
+     "feature": "inflow_ratio_3m",
+     "thresholds": [
+      0.6003500223159791,
+      0.6667500138282777,
+      0.7335499823093415,
+      0.8333500027656556,
+      0.8667500019073487,
+      0.9001500010490419,
+      0.9124500155448915,
+      1.0000500082969668,
+      1.0700500011444094,
+      1.1631500124931338,
+      1.3598499894142153,
+      1.484399974346161
+     ],
+     "values": [
+      1.537067034725448,
+      1.1901262330221716,
+      0.7884747548862219,
+      0.6458237979580608,
+      0.4340039985254424,
+      0.1685768967155953,
+      0.017659747547705967,
+      -0.052471220069392116,
+      -0.21769518721180986,
+      -0.4828094928950499,
+      -0.5409982644352327,
+      -0.8457607283459643,
+      -1.0581041582659634
+     ],
+     "missing": 0.050467587844118
+    },
+    {
+     "feature": "transfer_in_share_3m",
+     "thresholds": [
+      0.0020500000100582842,
+      0.00454999995417893,
+      0.009449999779462816,
+      0.036749999970197685,
+      0.16420000046491626,
+      0.18625000119209292,
+      0.23335000127553943,
+      0.2590499967336655,
+      0.3038999885320664,
+      0.3243000060319901,
+      0.36920000612735754,
+      0.46064999699592596,
+      0.5063499808311464,
+      0.5654999911785127,
+      0.9397999942302705
+     ],
+     "values": [
+      -0.10002542353986629,
+      -0.12780575223469248,
+      -0.32798225905515654,
+      -0.3657755264948799,
+      -0.3823080938619151,
+      -0.10066570902746065,
+      0.10528913620634169,
+      0.12996711185610496,
+      0.19502815788351338,
+      0.31648403165482997,
+      0.4201567901543008,
+      0.49140692876815906,
+      0.5809382924822162,
+      0.5862548528922209,
+      1.108501469503282,
+      0.5077512861559398
+     ],
+     "missing": -0.10778448069131955
+    },
+    {
+     "feature": "buffer_days",
+     "thresholds": [
+      1.5555999875068667,
+      4.2746000289917,
+      9.107299804687502,
+      10.292249679565431,
+      15.459200382232668,
+      32.86640167236329,
+      35.359800338745124,
+      37.91309928894044,
+      46.116649627685554,
+      55.288999557495124,
+      56.79535102844239,
+      58.902851104736335
+     ],
+     "values": [
+      1.2392625103653785,
+      0.6551710996698942,
+      0.6161537204115038,
+      0.4590710318430571,
+      0.34748874494944376,
+      0.25369679424228947,
+      0.25108952671851414,
+      0.09516006689620216,
+      0.059223114673370825,
+      -0.2690934043272001,
+      -0.37223578080831765,
+      -0.8200818412355804,
+      -0.8982276656115404
+     ],
+     "missing": 0.45907103184305703
+    },
+    {
+     "feature": "buffer_days_change_6m",
+     "thresholds": [
+      -8.666100025177,
+      -6.357650041580199,
+      -4.316849946975707,
+      -2.0676500797271724,
+      -1.3673000335693357
+     ],
+     "values": [
+      0.24159478897830505,
+      0.16780101233455763,
+      0.11513250041856024,
+      0.0701733040155374,
+      -0.07652789452492417,
+      -0.08825955643304606
+     ],
+     "missing": 0.07017330401553742
+    },
+    {
+     "feature": "min_balance_ratio_3m",
+     "thresholds": [
+      1.0000000180025095e-35,
+      0.034250000491738326,
+      0.0733499974012375,
+      0.10554999858140947,
+      0.20095000416040423,
+      1.5640500187873843
+     ],
+     "values": [
+      0.24116862813482653,
+      0.22898927705275968,
+      0.16760433034416264,
+      -0.034269643256890345,
+      -0.1356270116798169,
+      -0.14180184771068088,
+      -0.15420953246797908
+     ],
+     "missing": 0.24116862813482653
+    },
+    {
+     "feature": "od_count_3m",
+     "thresholds": [
+      2.5000000000000004
+     ],
+     "values": [
+      -0.00035296408374649573,
+      0.03195433107868503
+     ],
+     "missing": -0.00035296408374649573
+    },
+    {
+     "feature": "od_months_6m",
+     "thresholds": [
+      5.500000000000001
+     ],
+     "values": [
+      -2.2805614909746137e-05,
+      0.00830495031392272
+     ],
+     "missing": -2.2805614909746137e-05
+    },
+    {
+     "feature": "ext_debt_pay_ratio_3m",
+     "thresholds": [
+      0.006250000093132258,
+      0.017649999819695953,
+      0.018550000153481964,
+      0.11134999990463258,
+      0.12354999780654909,
+      0.18005000054836276
+     ],
+     "values": [
+      -0.07204426137532337,
+      -0.03852206743208414,
+      0.015072101570318765,
+      0.07820377866977732,
+      0.146070689971785,
+      0.301028082469535,
+      0.5519205126545792
+     ],
+     "missing": -0.05696726863972783
+    },
+    {
+     "feature": "ext_debt_pay_change_3m",
+     "thresholds": [
+      1.0000000180025095e-35,
+      0.3419999927282334,
+      0.6714999973773957,
+      0.8896999955177308,
+      0.9927500188350679,
+      1.0003499984741213,
+      1.060599982738495,
+      1.1052500009536745,
+      1.1449499726295473,
+      1.1532999873161318,
+      1.1931999921798708,
+      1.2567999958992007,
+      1.459549963474274,
+      2.3403500318527226
+     ],
+     "values": [
+      -2.357439423368538,
+      -2.4911403022752245,
+      -2.039217258617004,
+      -1.281661225814524,
+      -1.172655323954326,
+      0.019780787947418943,
+      -0.17920430649895777,
+      0.03942943855335415,
+      0.10599153885169194,
+      0.2907361096773017,
+      0.3276861199687058,
+      0.3237307834176617,
+      -0.1721788947573984,
+      -0.3831073452368108,
+      -0.10488770924397367
+     ],
+     "missing": 0.01978078794741895
+    },
+    {
+     "feature": "disc_spend_ratio_3m",
+     "thresholds": [
+      0.746950000524521,
+      0.7819499969482423,
+      0.8372499942779542,
+      0.8966500163078309,
+      0.937150001525879,
+      1.0016500353813174,
+      1.0230500102043154,
+      1.0339500308036806,
+      1.0395500063896181,
+      1.0634500384330752,
+      1.0830499529838564,
+      1.4164499640464785
+     ],
+     "values": [
+      0.11162105327701968,
+      0.09852604669210097,
+      0.042395564928210054,
+      0.05961070576569656,
+      0.024431471084402703,
+      0.07724111719357299,
+      0.036058937199016525,
+      0.0049934929506254,
+      -0.019328652367304605,
+      -0.06832053724317444,
+      -0.09165831742564545,
+      -0.10008298328195708,
+      0.018239315620471732
+     ],
+     "missing": -0.061954806955309145
+    },
+    {
+     "feature": "utilization",
+     "thresholds": [
+      0.22314999997615817,
+      0.23494999855756762,
+      0.2538499981164933,
+      0.2817499935626984,
+      0.4358499944210053,
+      0.4488500058650971,
+      0.535950005054474,
+      0.585649996995926,
+      0.6149500012397767,
+      0.646349996328354,
+      0.7151499986648561,
+      0.7871499955654145,
+      0.8238500058650972,
+      0.8607500195503236,
+      0.9328500032424928
+     ],
+     "values": [
+      -0.47647685412738827,
+      -0.45941535630452623,
+      -0.4392105682664704,
+      -0.40494247141765616,
+      -0.30167594015488497,
+      -0.24788617290670523,
+      -0.08575405694783989,
+      0.01817256479364726,
+      0.13498366480407764,
+      0.3048473351438239,
+      0.4541039981609174,
+      0.6600051097920252,
+      0.6898077744048496,
+      0.8053432041992759,
+      1.1359446483834343,
+      1.99698399610915
+     ],
+     "missing": -0.47647685412738827
+    },
+    {
+     "feature": "util_change_3m",
+     "thresholds": [
+      0.010650000069290401,
+      0.02314999978989363,
+      0.1374500021338463
+     ],
+     "values": [
+      -0.025598332627708227,
+      -0.00920799605685766,
+      0.03819811374823399,
+      0.2857618055937642
+     ],
+     "missing": -0.025598332627708227
+    },
+    {
+     "feature": "util_change_6m",
+     "thresholds": [
+      0.01625000033527613,
+      0.039750000461936004,
+      0.08455000072717668,
+      0.12814999371767047,
+      0.1926499977707863
+     ],
+     "values": [
+      -0.08403307289807717,
+      -0.024452869571338617,
+      0.13870013203265485,
+      0.29098073139102626,
+      0.44936980450684827,
+      0.748594297419467
+     ],
+     "missing": -0.08403307289807717
+    },
+    {
+     "feature": "pay_ratio_3m",
+     "thresholds": [
+      0.2937500029802323,
+      0.9683499932289125
+     ],
+     "values": [
+      0.11874710802052653,
+      0.06067608611753256,
+      -0.10976127740169275
+     ],
+     "missing": 0.11874710802052653
+    },
+    {
+     "feature": "pay_to_min_3m",
+     "thresholds": [
+      1.1374499797821047,
+      8.349250316619875,
+      16.89354991912842
+     ],
+     "values": [
+      0.12024451280025902,
+      0.020137247496032615,
+      0.007543593184924327,
+      -0.010186371994726346
+     ],
+     "missing": 0.12024451280025902
+    },
+    {
+     "feature": "min_pay_months_6m",
+     "thresholds": [
+      1.0000000180025095e-35,
+      3.5000000000000004,
+      4.500000000000001
+     ],
+     "values": [
+      -0.00533715724983596,
+      0.036192112201552495,
+      0.10286980087195272,
+      0.21956803112165377
+     ],
+     "missing": -0.00533715724983596
+    },
+    {
+     "feature": "pay_ratio_drift",
+     "thresholds": [
+      -0.057150000706315034,
+      -0.047250000759959214,
+      -0.040349999442696564,
+      -0.028050000779330727,
+      -0.022850000299513337,
+      -0.020650000311434265,
+      -0.003849999979138374
+     ],
+     "values": [
+      0.22086047341955978,
+      0.19949592741147285,
+      0.1804690732486051,
+      0.11211927502588759,
+      0.008250613182048876,
+      -0.017726552811257533,
+      -0.034418934296242085,
+      -0.04076023467589776
+     ],
+     "missing": -0.04076023467589776
+    },
+    {
+     "feature": "cash_adv_to_limit_3m",
+     "thresholds": [
+      0.09304999932646753,
+      0.10960000008344652,
+      0.12600000202655795
+     ],
+     "values": [
+      -0.0005352614366736757,
+      0.04735312649966248,
+      0.8318270001586657,
+      1.2494395273508165
+     ],
+     "missing": -0.0005352614366736757
+    },
+    {
+     "feature": "late_fee_count_6m",
+     "thresholds": [
+      1.5000000000000002,
+      2.5000000000000004,
+      4.500000000000001,
+      5.500000000000001
+     ],
+     "values": [
+      -0.035726227100318184,
+      0.2843393141610177,
+      0.39536825258094516,
+      0.5522776013320281,
+      0.7625690604565564
+     ],
+     "missing": -0.035726227100318184
+    },
+    {
+     "feature": "card_spend_ratio_3m",
+     "thresholds": [
+      0.7018499970436097,
+      0.8486499786376954,
+      0.8805499970912934,
+      0.9149500131607057,
+      0.9271500110626222,
+      0.9422500133514405,
+      1.0030500292778017,
+      1.0426500439643862,
+      1.060849964618683,
+      1.0900500416755678,
+      1.1376499533653261,
+      1.1755500435829165,
+      1.2118499875068667
+     ],
+     "values": [
+      0.16719034081562556,
+      0.12636402717652684,
+      0.10080265836168172,
+      0.03710228155278191,
+      -0.02981645994593901,
+      -0.06600367449012867,
+      -0.13643497856485792,
+      -0.019679423137394722,
+      0.013487720462394354,
+      0.026574779216696452,
+      0.050801775806633635,
+      0.072191530450398,
+      0.1982380722832197,
+      0.2786428035186883
+     ],
+     "missing": 0.5649818573437305
+    },
+    {
+     "feature": "max_cpd_12m",
+     "thresholds": [
+      1.5000000000000002,
+      2.5000000000000004,
+      3.5000000000000004,
+      4.500000000000001
+     ],
+     "values": [
+      -0.015132857886976187,
+      0.5804929795509977,
+      1.139595475715878,
+      1.2599229899932052,
+      1.3298022450871831
+     ],
+     "missing": -0.015132857886976187
+    }
+   ],
+   "meta": {
+    "trees": 1428,
+    "learning_rate": 0.12,
+    "min_leaf": 400,
+    "monotone": true,
+    "alert_threshold": 0.09959182496795461,
+    "alert_share_on_validation": 0.05
+   }
+  },
+  "bankruptcy": {
+   "name": "bankruptcy",
+   "link": "logit",
+   "intercept": -6.710290458970678,
+   "calibration": {
+    "a": -0.27703183586937064,
+    "b": 0.9238948670876432
+   },
+   "terms": [
+    {
+     "feature": "payroll_amt_ratio_3m",
+     "thresholds": [
+      1.0538499951362612,
+      1.160250008106232,
+      1.200150012969971,
+      1.9624499678611758
+     ],
+     "values": [
+      0.014005447119094242,
+      -0.03544720787409297,
+      -0.5180538206025257,
+      -0.6084988433625547,
+      -1.0887666882450429
+     ],
+     "missing": 0.014005447119094242
+    },
+    {
+     "feature": "payroll_missed_cycles_3m",
+     "thresholds": [
+      1e+300
+     ],
+     "values": [
+      -0.23315694404546447,
+      0.30733917782305115
+     ],
+     "missing": 0.30733917782305115
+    },
+    {
+     "feature": "inflow_ratio_3m",
+     "thresholds": [
+      1.0000500082969668,
+      1.3986499905586245,
+      1.6167500019073489
+     ],
+     "values": [
+      0.02824912076484562,
+      -0.28292208169875566,
+      -0.4975197966941773,
+      -1.2416204765156613
+     ],
+     "missing": 0.02824912076484562
+    },
+    {
+     "feature": "transfer_in_share_3m",
+     "thresholds": [
+      0.009449999779462816,
+      0.10514999926090242,
+      0.1552500054240227,
+      0.16420000046491626,
+      0.18625000119209292,
+      0.19969999790191653,
+      0.3243000060319901,
+      0.5063499808311464,
+      0.9397999942302705
+     ],
+     "values": [
+      0.12255830261888787,
+      -0.048499927615946715,
+      0.03858987332488724,
+      0.05302089583112898,
+      0.3000273121118448,
+      0.42347723562475525,
+      0.42811273525195376,
+      0.6722798417678971,
+      0.815845465329667,
+      -0.291712489964486
+     ],
+     "missing": -0.13662102450821342
+    },
+    {
+     "feature": "buffer_days_change_6m",
+     "thresholds": [
+      -10.491950035095213
+     ],
+     "values": [
+      0.013968627836859638,
+      -0.0010533462398863982
+     ],
+     "missing": -0.0010533462398863982
+    },
+    {
+     "feature": "stl_months_6m",
+     "thresholds": [
+      1.0000000180025095e-35,
+      5.500000000000001
+     ],
+     "values": [
+      -0.0012188584128063444,
+      0.4926380478283719,
+      0.5795994575519682
+     ],
+     "missing": -0.0012188584128063444
+    },
+    {
+     "feature": "ext_debt_pay_ratio_3m",
+     "thresholds": [
+      0.11134999990463258,
+      0.12354999780654909,
+      0.13915000110864642,
+      0.18005000054836276
+     ],
+     "values": [
+      -0.07418400376284327,
+      0.2710034508400186,
+      0.4314654056524013,
+      0.5198275930444273,
+      1.6073710661021674
+     ],
+     "missing": 0.02020825415248148
+    },
+    {
+     "feature": "ext_debt_pay_change_3m",
+     "thresholds": [
+      1.0000000180025095e-35,
+      0.3419999927282334,
+      0.6714999973773957,
+      0.8896999955177308,
+      1.060599982738495,
+      1.0839500427246096,
+      1.1148499846458437,
+      1.1254000067710879,
+      1.1532999873161318,
+      1.1805499792099001,
+      1.1931999921798708,
+      1.2905499935150149,
+      1.3145499825477602,
+      1.3681499958038332,
+      1.3873000144958498,
+      1.4846500158309939,
+      1.6654999852180483,
+      2.0011999607086186,
+      2.6233000755310063
+     ],
+     "values": [
+      3.687471455264066,
+      2.6194384633075254,
+      1.8754138074835955,
+      0.4708165324241199,
+      -0.09316761320913308,
+      0.792201516411539,
+      1.2936213622516022,
+      0.6976971258862051,
+      0.33983554828859586,
+      0.7464518006349512,
+      0.5806562375812372,
+      0.25773676586352307,
+      0.26611549440961907,
+      -0.414160333188704,
+      -0.7520119826799674,
+      -1.1069603687673903,
+      -0.9822608108567228,
+      -0.6745668072755273,
+      -0.5129629187998974,
+      -0.21222565081955996
+     ],
+     "missing": 0.2427672266229248
+    },
+    {
+     "feature": "disc_spend_ratio_3m",
+     "thresholds": [
+      1.0000000180025095e-35,
+      0.6632499992847444,
+      0.746950000524521,
+      0.7819499969482423,
+      0.8234499990940095,
+      0.8372499942779542,
+      0.8709499835968019,
+      0.8966500163078309,
+      0.9432500004768373,
+      0.9548500180244447,
+      0.9973500072956086,
+      1.0122500061988833,
+      1.0176500082015993,
+      1.0284499526023867,
+      1.0574499964714053,
+      1.1225499510765078,
+      1.1318500041961672,
+      1.2647500038146975,
+      1.4164499640464785
+     ],
+     "values": [
+      -0.19457538394079335,
+      -0.8052428963579118,
+      -0.31209675559303884,
+      -0.21977893660321465,
+      -0.11049754252391313,
+      -0.08875673352877586,
+      -0.06504145246565012,
+      0.024187555702633118,
+      0.02164443986299812,
+      0.07605375766392095,
+      0.08102614681775619,
+      0.24424225802415359,
+      0.06011101187016124,
+      0.048090950730327015,
+      0.021843974344239528,
+      -0.041619583324627424,
+      -0.03524641508777311,
+      -0.02224303389614926,
+      0.1432324293127961,
+      0.6267143192297228
+     ],
+     "missing": -0.16450075568433292
+    },
+    {
+     "feature": "utilization",
+     "thresholds": [
+      0.18155000358819964,
+      0.646349996328354,
+      0.7503499984741212,
+      0.8238500058650972,
+      0.8607500195503236,
+      0.8979499936103822,
+      0.9328500032424928,
+      0.9643499851226808
+     ],
+     "values": [
+      -0.17522901171088878,
+      -0.16885641492821535,
+      -0.1123967331821204,
+      0.05908031963941196,
+      0.5057098478609086,
+      0.7545978967142468,
+      1.1860125146276363,
+      1.3207794389213947,
+      1.4166151367873967
+     ],
+     "missing": -0.17522901171088878
+    },
+    {
+     "feature": "util_change_3m",
+     "thresholds": [
+      0.08314999938011171,
+      0.1374500021338463
+     ],
+     "values": [
+      -0.01733886978656557,
+      0.02667974135213521,
+      0.49175682583246855
+     ],
+     "missing": -0.01733886978656557
+    },
+    {
+     "feature": "util_change_6m",
+     "thresholds": [
+      0.01625000033527613,
+      0.05265000090003014,
+      0.05825000070035458,
+      0.06504999846220018,
+      0.10074999928474428,
+      0.1926499977707863
+     ],
+     "values": [
+      -0.07373758837928028,
+      -0.04017913479377773,
+      0.07187135361741166,
+      0.07852955904736708,
+      0.2024193103581215,
+      0.3554249996041969,
+      0.9419067521522382
+     ],
+     "missing": -0.07373758837928028
+    },
+    {
+     "feature": "pay_ratio_3m",
+     "thresholds": [
+      0.26805000007152563,
+      0.46635000407695776
+     ],
+     "values": [
+      0.20106340352726537,
+      0.08005259057086202,
+      -0.08729809741248597
+     ],
+     "missing": 0.20106340352726537
+    },
+    {
+     "feature": "pay_to_min_3m",
+     "thresholds": [
+      1.1374499797821047
+     ],
+     "values": [
+      2.234311620555072,
+      -0.04560301700402558
+     ],
+     "missing": 2.234311620555072
+    },
+    {
+     "feature": "min_pay_months_6m",
+     "thresholds": [
+      1.0000000180025095e-35
+     ],
+     "values": [
+      -0.008595196175653956,
+      0.12191137268778657
+     ],
+     "missing": -0.008595196175653956
+    },
+    {
+     "feature": "pay_ratio_drift",
+     "thresholds": [
+      -0.28589999675750727,
+      -0.07124999910593031,
+      -0.057150000706315034,
+      -0.040349999442696564,
+      -0.01864999998360872,
+      -0.011850000359117983
+     ],
+     "values": [
+      0.7397816318301074,
+      0.45468176959940915,
+      0.25117736532675156,
+      0.016440609680804963,
+      -0.02829595554932221,
+      -0.04468515521606964,
+      -0.06584158324721967
+     ],
+     "missing": -0.06584158324721967
+    },
+    {
+     "feature": "cash_adv_to_limit_3m",
+     "thresholds": [
+      0.012149999849498274,
+      0.025449999608099464,
+      0.042749999091029174,
+      0.07600000128149988,
+      0.09304999932646753
+     ],
+     "values": [
+      -0.0059349622405166225,
+      0.08981710017283648,
+      0.3567599653651845,
+      1.4396505560683566,
+      1.5041535874780847,
+      1.5512097340679347
+     ],
+     "missing": -0.0059349622405166225
+    },
+    {
+     "feature": "cash_adv_months_6m",
+     "thresholds": [
+      1.0000000180025095e-35,
+      1.5000000000000002,
+      2.5000000000000004
+     ],
+     "values": [
+      -0.013518720949451932,
+      0.8174909701268104,
+      1.1658058017571473,
+      1.6863058953849308
+     ],
+     "missing": -0.013518720949451932
+    },
+    {
+     "feature": "card_spend_ratio_3m",
+     "thresholds": [
+      1.0000000180025095e-35,
+      0.7018499970436097,
+      0.8149499893188478,
+      0.8486499786376954,
+      0.8911499977111818,
+      0.9467499852180482,
+      0.9968500137329103,
+      0.9998500049114228,
+      1.0131500363349917,
+      1.0309500098228457,
+      1.060849964618683,
+      1.1145499944686892,
+      1.1755500435829165,
+      1.2994499802589419
+     ],
+     "values": [
+      -0.84019458410457,
+      0.01248985212576905,
+      0.02953744144686619,
+      -0.017453737756156572,
+      -0.05906757771954619,
+      0.0018068918594398714,
+      -0.08100158649149547,
+      -0.12473760218878324,
+      -0.12959252813391928,
+      -0.024896019459912648,
+      -0.07810009409250082,
+      0.09080310697598067,
+      0.019603353570684892,
+      0.3868273109179602,
+      0.4970921137557054
+     ],
+     "missing": 0.21088257849688066
+    },
+    {
+     "feature": "max_cpd_12m",
+     "thresholds": [
+      3.5000000000000004
+     ],
+     "values": [
+      -0.0011963380548734547,
+      0.31824119749702307
+     ],
+     "missing": -0.0011963380548734547
+    }
+   ],
+   "meta": {
+    "trees": 1824,
+    "learning_rate": 0.12,
+    "min_leaf": 400,
+    "monotone": true,
+    "alert_threshold": 0.038568335821861,
+    "alert_share_on_validation": 0.02
+   }
+  },
+  "value_effects": {
+   "none": {
+    "name": "value_effect_none",
+    "link": "identity",
+    "intercept": 77.12256754778686,
+    "calibration": {
+     "a": 0.0,
+     "b": 1.0
+    },
+    "terms": [
+     {
+      "feature": "payroll_amt_ratio_3m",
+      "thresholds": [
+       0.7536999881267549
+      ],
+      "values": [
+       -309.85410894481834,
+       33.114554075008286
+      ],
+      "missing": 33.114554075008286
+     },
+     {
+      "feature": "transfer_in_share_3m",
+      "thresholds": [
+       0.29769998788833624
+      ],
+      "values": [
+       3.569583287328066,
+       -12.32772385838654
+      ],
+      "missing": -3.6824536106558567
+     },
+     {
+      "feature": "buffer_days",
+      "thresholds": [
+       1.0664000511169436,
+       67.41455078125001
+      ],
+      "values": [
+       -173.7912168208081,
+       49.41471479936991,
+       -54.734054802962056
+      ],
+      "missing": -9.683273129190301
+     },
+     {
+      "feature": "buffer_days_change_6m",
+      "thresholds": [
+       11.265749931335451
+      ],
+      "values": [
+       0.8810454250975378,
+       -12.224036632044774
+      ],
+      "missing": 0.8810454250975378
+     },
+     {
+      "feature": "ext_debt_pay_ratio_3m",
+      "thresholds": [
+       0.08179999887943269,
+       0.14015000313520434
+      ],
+      "values": [
+       7.774434993468795,
+       -25.114516620058847,
+       -86.00631696778605
+      ],
+      "missing": 7.774434993468795
+     },
+     {
+      "feature": "ext_debt_pay_change_3m",
+      "thresholds": [
+       1.0750499963760378
+      ],
+      "values": [
+       7.859431160166228,
+       -186.29351315333943
+      ],
+      "missing": 7.859431160166228
+     },
+     {
+      "feature": "disc_spend_ratio_3m",
+      "thresholds": [
+       1.2350500226020815
+      ],
+      "values": [
+       10.593924379704347,
+       -87.37184987758812
+      ],
+      "missing": -87.37184987758812
+     },
+     {
+      "feature": "util_change_3m",
+      "thresholds": [
+       0.370049998164177
+      ],
+      "values": [
+       5.956566538793716,
+       -123.3675225068798
+      ],
+      "missing": 5.956566538793716
+     },
+     {
+      "feature": "util_change_6m",
+      "thresholds": [
+       0.27610000967979437
+      ],
+      "values": [
+       2.4834274915949073,
+       -20.33081901791889
+      ],
+      "missing": 2.4834274915949073
+     },
+     {
+      "feature": "pay_ratio_3m",
+      "thresholds": [
+       0.6227000057697297
+      ],
+      "values": [
+       15.638850891102617,
+       -28.146173770370506
+      ],
+      "missing": 15.638850891102617
+     },
+     {
+      "feature": "min_pay_months_6m",
+      "thresholds": [
+       1.0000000180025095e-35
+      ],
+      "values": [
+       11.11125721493444,
+       -30.67400324208905
+      ],
+      "missing": 11.11125721493444
+     },
+     {
+      "feature": "pay_ratio_drift",
+      "thresholds": [
+       -0.030250000767409798,
+       -0.026749999262392517
+      ],
+      "values": [
+       -16.139639770526568,
+       4.912207711343135,
+       11.382251068202592
+      ],
+      "missing": 11.382251068202592
+     },
+     {
+      "feature": "cash_adv_to_limit_3m",
+      "thresholds": [
+       0.030550000257790092,
+       0.03605000115931035,
+       0.04190000146627427
+      ],
+      "values": [
+       10.745295224307917,
+       -2.472452950296661,
+       -88.73020267817233,
+       -217.6684259685926
+      ],
+      "missing": 10.745295224307917
+     },
+     {
+      "feature": "statement_balance",
+      "thresholds": [
+       6966.945000000001
+      ],
+      "values": [
+       -13.786734519496834,
+       72.2695699678267
+      ],
+      "missing": -13.786734519496834
+     },
+     {
+      "feature": "open_to_buy",
+      "thresholds": [
+       153.90500000000003
+      ],
+      "values": [
+       -41.15641022078409,
+       4.499645611253608
+      ],
+      "missing": -41.15641022078409
+     }
+    ],
+    "meta": {
+     "trees": 120,
+     "learning_rate": 0.05,
+     "min_leaf": 250,
+     "monotone": false
+    }
+   },
+   "due_date_change": {
+    "name": "value_effect_due_date_change",
+    "link": "identity",
+    "intercept": 118.33012668138194,
+    "calibration": {
+     "a": 0.0,
+     "b": 1.0
+    },
+    "terms": [
+     {
+      "feature": "payroll_gap_days",
+      "thresholds": [
+       21.500000000000004
+      ],
+      "values": [
+       11.935265954470932,
+       -313.7008599527607
+      ],
+      "missing": 11.935265954470932
+     },
+     {
+      "feature": "transfer_in_share_3m",
+      "thresholds": [
+       0.12344999983906747
+      ],
+      "values": [
+       3.289340339729017,
+       -12.171644847868562
+      ],
+      "missing": 3.289340339729017
+     },
+     {
+      "feature": "buffer_days_change_6m",
+      "thresholds": [
+       -0.6644500195980071,
+       2.9721000194549565
+      ],
+      "values": [
+       18.639129358162563,
+       -8.843237356276855,
+       -25.159518908703298
+      ],
+      "missing": -8.843237356276855
+     },
+     {
+      "feature": "disc_spend_ratio_3m",
+      "thresholds": [
+       0.6984499990940095
+      ],
+      "values": [
+       -113.78815737001175,
+       11.159486212386657
+      ],
+      "missing": 11.159486212386657
+     },
+     {
+      "feature": "util_change_3m",
+      "thresholds": [
+       0.16194999963045123,
+       0.3506499975919724
+      ],
+      "values": [
+       23.745577770581768,
+       -51.60963025176615,
+       -155.91570652944313
+      ],
+      "missing": 23.745577770581768
+     },
+     {
+      "feature": "util_change_6m",
+      "thresholds": [
+       0.05305000022053719
+      ],
+      "values": [
+       3.004062886964724,
+       -3.774115762615694
+      ],
+      "missing": 3.004062886964724
+     },
+     {
+      "feature": "pay_ratio_3m",
+      "thresholds": [
+       0.03824999928474427
+      ],
+      "values": [
+       163.33270806771637,
+       -6.834404463404081
+      ],
+      "missing": 163.33270806771637
+     },
+     {
+      "feature": "cash_adv_to_limit_3m",
+      "thresholds": [
+       0.014599999878555538
+      ],
+      "values": [
+       4.13955862871201,
+       -40.86471159275092
+      ],
+      "missing": 4.13955862871201
+     },
+     {
+      "feature": "late_fee_count_6m",
+      "thresholds": [
+       1.0000000180025095e-35
+      ],
+      "values": [
+       -34.389574179455806,
+       82.27939091435306
+      ],
+      "missing": -34.389574179455806
+     },
+     {
+      "feature": "card_spend_ratio_3m",
+      "thresholds": [
+       1.0750499963760378,
+       1.1072000265121462,
+       1.1695500016212466
+      ],
+      "values": [
+       15.87954312746278,
+       0.30623442387483296,
+       -10.552253511922233,
+       -72.76353693019797
+      ],
+      "missing": 15.87954312746278
+     },
+     {
+      "feature": "statement_balance",
+      "thresholds": [
+       2599.7400000000002,
+       4044.2600000000007,
+       5285.7300000000005,
+       9969.12
+      ],
+      "values": [
+       -70.72282359704278,
+       -49.059509313612054,
+       -33.928845029224036,
+       -3.851886588889215,
+       681.3414136170225
+      ],
+      "missing": -70.72282359704278
+     },
+     {
+      "feature": "open_to_buy",
+      "thresholds": [
+       6976.740000000001
+      ],
+      "values": [
+       -5.939138558440379,
+       47.05911416668987
+      ],
+      "missing": -5.939138558440379
+     }
+    ],
+    "meta": {
+     "trees": 120,
+     "learning_rate": 0.05,
+     "min_leaf": 250,
+     "monotone": false
+    }
+   },
+   "hardship_plan": {
+    "name": "value_effect_hardship_plan",
+    "link": "identity",
+    "intercept": -199.9826276554302,
+    "calibration": {
+     "a": 0.0,
+     "b": 1.0
+    },
+    "terms": [
+     {
+      "feature": "inflow_ratio_3m",
+      "thresholds": [
+       0.7388499975204469,
+       0.7502999901771547,
+       1.0004500150680544
+      ],
+      "values": [
+       156.97710637675772,
+       91.34487122593731,
+       -19.164669666719163,
+       2.3770466708744777
+      ],
+      "missing": -19.164669666719192
+     },
+     {
+      "feature": "buffer_days",
+      "thresholds": [
+       -0.0007499999774154275
+      ],
+      "values": [
+       77.76597751227604,
+       -7.684337147248005
+      ],
+      "missing": -7.684337147248005
+     },
+     {
+      "feature": "buffer_days_change_6m",
+      "thresholds": [
+       -32.058500289916985,
+       9.791800022125246
+      ],
+      "values": [
+       15.126158429067107,
+       1.5152904588247533,
+       -38.76550631246109
+      ],
+      "missing": 1.5152904588247536
+     },
+     {
+      "feature": "min_balance_ratio_3m",
+      "thresholds": [
+       -0.35045000910758967
+      ],
+      "values": [
+       45.24369293158257,
+       -2.6465859474264097
+      ],
+      "missing": -2.6465859474264097
+     },
+     {
+      "feature": "od_months_6m",
+      "thresholds": [
+       3.5000000000000004
+      ],
+      "values": [
+       -6.5487219952253675,
+       93.01165408337368
+      ],
+      "missing": -6.5487219952253675
+     },
+     {
+      "feature": "neg_days_3m",
+      "thresholds": [
+       5.500000000000001
+      ],
+      "values": [
+       -1.0403409651897693,
+       19.301214740284628
+      ],
+      "missing": -1.0403409651897693
+     },
+     {
+      "feature": "ext_debt_pay_ratio_3m",
+      "thresholds": [
+       0.14375000447034839,
+       0.15564999729394915
+      ],
+      "values": [
+       6.965871963916137,
+       -98.62073300896785,
+       -107.55273516731532
+      ],
+      "missing": 6.965871963916137
+     },
+     {
+      "feature": "ext_debt_pay_change_3m",
+      "thresholds": [
+       1.0001000165939333
+      ],
+      "values": [
+       1.4652122322656875,
+       -27.424504582631158
+      ],
+      "missing": 1.4652122322656875
+     },
+     {
+      "feature": "disc_spend_ratio_3m",
+      "thresholds": [
+       0.6045500040054322,
+       0.7428500056266786,
+       0.9539499878883363
+      ],
+      "values": [
+       -87.02868121260944,
+       -38.40916304312003,
+       6.16539632794525,
+       10.666086753101617
+      ],
+      "missing": -87.02868121260944
+     },
+     {
+      "feature": "util_change_6m",
+      "thresholds": [
+       0.25489999353885656
+      ],
+      "values": [
+       -2.336010042399994,
+       16.413333958117178
+      ],
+      "missing": -2.336010042399994
+     },
+     {
+      "feature": "pay_ratio_3m",
+      "thresholds": [
+       0.03885000012814999
+      ],
+      "values": [
+       -188.353319356635,
+       7.947985788664643
+      ],
+      "missing": -188.353319356635
+     },
+     {
+      "feature": "min_pay_months_6m",
+      "thresholds": [
+       1.0000000180025095e-35
+      ],
+      "values": [
+       6.242101873198668,
+       -19.258858710344818
+      ],
+      "missing": 6.242101873198668
+     },
+     {
+      "feature": "pay_ratio_drift",
+      "thresholds": [
+       -0.4471499919891357
+      ],
+      "values": [
+       -65.03940515039194,
+       3.752837201765665
+      ],
+      "missing": 3.752837201765665
+     },
+     {
+      "feature": "cash_adv_to_limit_3m",
+      "thresholds": [
+       0.030550000257790092
+      ],
+      "values": [
+       0.4810914776420484,
+       -7.839308795385911
+      ],
+      "missing": 0.4810914776420484
+     },
+     {
+      "feature": "card_spend_ratio_3m",
+      "thresholds": [
+       0.5071000158786775,
+       0.8136500120162965
+      ],
+      "values": [
+       -27.027155333098012,
+       -9.840181982532133,
+       3.551954525368623
+      ],
+      "missing": 3.551954525368623
+     },
+     {
+      "feature": "statement_balance",
+      "thresholds": [
+       6873.965000000001,
+       8518.87
+      ],
+      "values": [
+       13.17125562536572,
+       -19.89854891245183,
+       -101.52626162515902
+      ],
+      "missing": 13.17125562536572
+     }
+    ],
+    "meta": {
+     "trees": 120,
+     "learning_rate": 0.05,
+     "min_leaf": 250,
+     "monotone": false
+    }
+   },
+   "limit_decrease": {
+    "name": "value_effect_limit_decrease",
+    "link": "identity",
+    "intercept": -68.53209884022496,
+    "calibration": {
+     "a": 0.0,
+     "b": 1.0
+    },
+    "terms": [
+     {
+      "feature": "inflow_ratio_3m",
+      "thresholds": [
+       1.1136999726295473,
+       1.1277000308036806
+      ],
+      "values": [
+       -1.475013573736169,
+       11.768864454785653,
+       24.49003196720409
+      ],
+      "missing": -1.475013573736169
+     },
+     {
+      "feature": "transfer_in_share_3m",
+      "thresholds": [
+       0.17279999703168872
+      ],
+      "values": [
+       1.4823404745542954,
+       -6.795058314293722
+      ],
+      "missing": 1.4823404745542954
+     },
+     {
+      "feature": "buffer_days_change_6m",
+      "thresholds": [
+       7.292350053787232
+      ],
+      "values": [
+       1.0284001708234856,
+       -8.32598190931172
+      ],
+      "missing": 1.0284001708234856
+     },
+     {
+      "feature": "min_balance_ratio_3m",
+      "thresholds": [
+       -0.050249999389052384
+      ],
+      "values": [
+       3.9932615535987925,
+       -2.4626358084284417
+      ],
+      "missing": -2.4626358084284417
+     },
+     {
+      "feature": "ext_debt_pay_ratio_3m",
+      "thresholds": [
+       0.15625000000000003
+      ],
+      "values": [
+       4.340690659670288,
+       -9.311354167582078
+      ],
+      "missing": -9.311354167582078
+     },
+     {
+      "feature": "utilization",
+      "thresholds": [
+       0.524949997663498,
+       0.9900500178337098
+      ],
+      "values": [
+       -4.943053061661885,
+       35.242633365898904,
+       -408.9506215145383
+      ],
+      "missing": -4.943053061661885
+     },
+     {
+      "feature": "util_change_3m",
+      "thresholds": [
+       0.20380000025033954
+      ],
+      "values": [
+       7.116954979840231,
+       -39.036431301243745
+      ],
+      "missing": 7.116954979840231
+     },
+     {
+      "feature": "util_change_6m",
+      "thresholds": [
+       0.4047000110149384
+      ],
+      "values": [
+       3.5720680957898323,
+       -74.57257350609342
+      ],
+      "missing": 3.5720680957898323
+     },
+     {
+      "feature": "pay_ratio_3m",
+      "thresholds": [
+       0.03775000013411046
+      ],
+      "values": [
+       -448.0858738681084,
+       18.915128099362335
+      ],
+      "missing": -448.0858738681084
+     },
+     {
+      "feature": "pay_to_min_3m",
+      "thresholds": [
+       0.7717500030994416
+      ],
+      "values": [
+       98.91516601723482,
+       -3.8038579691170367
+      ],
+      "missing": 98.91516601723482
+     },
+     {
+      "feature": "pay_ratio_drift",
+      "thresholds": [
+       -0.04234999977052211
+      ],
+      "values": [
+       -32.398098438983574,
+       18.923637241285316
+      ],
+      "missing": 18.923637241285316
+     },
+     {
+      "feature": "late_fee_count_6m",
+      "thresholds": [
+       1.0000000180025095e-35
+      ],
+      "values": [
+       -4.5710792248306324,
+       11.072421112423903
+      ],
+      "missing": -4.5710792248306324
+     },
+     {
+      "feature": "card_spend_ratio_3m",
+      "thresholds": [
+       0.6327500045299531,
+       1.0067500472068789,
+       1.1360500454902651
+      ],
+      "values": [
+       55.81662134834739,
+       23.164469782942547,
+       -24.09500185742839,
+       -49.80166174111192
+      ],
+      "missing": -49.80166174111192
+     },
+     {
+      "feature": "max_cpd_12m",
+      "thresholds": [
+       1.0000000180025095e-35
+      ],
+      "values": [
+       -21.867034065600297,
+       69.25219830058106
+      ],
+      "missing": -21.867034065600297
+     },
+     {
+      "feature": "statement_balance",
+      "thresholds": [
+       9516.03
+      ],
+      "values": [
+       -23.658183275928863,
+       344.6954675945581
+      ],
+      "missing": -23.658183275928863
+     }
+    ],
+    "meta": {
+     "trees": 120,
+     "learning_rate": 0.05,
+     "min_leaf": 250,
+     "monotone": false
+    }
+   },
+   "outreach_call": {
+    "name": "value_effect_outreach_call",
+    "link": "identity",
+    "intercept": 72.99323677864793,
+    "calibration": {
+     "a": 0.0,
+     "b": 1.0
+    },
+    "terms": [
+     {
+      "feature": "inflow_ratio_3m",
+      "thresholds": [
+       0.5601499974727632
+      ],
+      "values": [
+       -256.9175664370786,
+       11.205009180801035
+      ],
+      "missing": 11.205009180801035
+     },
+     {
+      "feature": "transfer_in_share_3m",
+      "thresholds": [
+       0.022349999286234382
+      ],
+      "values": [
+       2.195626348402624,
+       -5.04010025914832
+      ],
+      "missing": 2.195626348402624
+     },
+     {
+      "feature": "buffer_days",
+      "thresholds": [
+       0.000650000001769513,
+       0.13159999996423724
+      ],
+      "values": [
+       -103.9073749033536,
+       -73.50439334290733,
+       17.046733605791697
+      ],
+      "missing": 17.046733605791697
+     },
+     {
+      "feature": "min_balance_ratio_3m",
+      "thresholds": [
+       -0.1862000003457069,
+       -0.10064999759197234
+      ],
+      "values": [
+       65.34259935030461,
+       -0.4075541655174628,
+       -15.919009848646724
+      ],
+      "missing": -15.919009848646724
+     },
+     {
+      "feature": "ext_debt_pay_change_3m",
+      "thresholds": [
+       1.00110000371933,
+       1.0803999900817873
+      ],
+      "values": [
+       3.831584626996534,
+       -9.393915165304815,
+       -71.71866007464587
+      ],
+      "missing": 3.831584626996534
+     },
+     {
+      "feature": "utilization",
+      "thresholds": [
+       0.9226499795913697
+      ],
+      "values": [
+       5.60565653220633,
+       -23.662338631140184
+      ],
+      "missing": 5.60565653220633
+     },
+     {
+      "feature": "util_change_6m",
+      "thresholds": [
+       -0.04615000076591968,
+       -0.03425000049173831,
+       -0.021049999631941315,
+       0.28405000269413
+      ],
+      "values": [
+       -82.9785637928622,
+       -72.35686660062697,
+       7.051223017644292,
+       15.382908174668065,
+       4.841988082527073
+      ],
+      "missing": 15.382908174668065
+     },
+     {
+      "feature": "pay_ratio_3m",
+      "thresholds": [
+       0.0639999993145466,
+       0.0709500014781952,
+       0.519549995660782,
+       0.5380499958992006
+      ],
+      "values": [
+       -99.9776195926538,
+       -45.16421087471386,
+       46.127010630705584,
+       25.359442543334097,
+       -17.90026250096974
+      ],
+      "missing": -99.9776195926538
+     },
+     {
+      "feature": "pay_to_min_3m",
+      "thresholds": [
+       0.9094499945640565
+      ],
+      "values": [
+       -27.725978357660757,
+       1.6038105269079954
+      ],
+      "missing": -27.725978357660757
+     },
+     {
+      "feature": "min_pay_months_6m",
+      "thresholds": [
+       3.5000000000000004
+      ],
+      "values": [
+       1.0899926271865912,
+       -15.350729499544489
+      ],
+      "missing": 1.0899926271865912
+     },
+     {
+      "feature": "pay_ratio_drift",
+      "thresholds": [
+       -0.2703500092029571
+      ],
+      "values": [
+       -45.4124288609989,
+       6.191939350493572
+      ],
+      "missing": 6.191939350493572
+     },
+     {
+      "feature": "late_fee_count_6m",
+      "thresholds": [
+       5.500000000000001
+      ],
+      "values": [
+       2.0484699207437833,
+       -21.12484605767026
+      ],
+      "missing": 2.0484699207437833
+     },
+     {
+      "feature": "card_spend_ratio_3m",
+      "thresholds": [
+       0.41685000061988836
+      ],
+      "values": [
+       -91.35109097730943,
+       5.706005833170289
+      ],
+      "missing": 5.706005833170289
+     },
+     {
+      "feature": "max_cpd_12m",
+      "thresholds": [
+       1.5000000000000002
+      ],
+      "values": [
+       3.544298372540319,
+       -49.68804675886843
+      ],
+      "missing": 3.544298372540319
+     },
+     {
+      "feature": "statement_balance",
+      "thresholds": [
+       1772.5100000000002,
+       3551.735,
+       10703.130000000003
+      ],
+      "values": [
+       -46.318177729035206,
+       -18.522035108822948,
+       45.513141181252394,
+       -48.537115264098844
+      ],
+      "missing": -46.318177729035206
+     },
+     {
+      "feature": "open_to_buy",
+      "thresholds": [
+       1077.8550000000002,
+       1167.2750000000003,
+       1531.3500000000001,
+       9410.285000000002
+      ],
+      "values": [
+       -51.44166176300121,
+       -44.5008267152798,
+       -19.37657165296816,
+       21.7590943341132,
+       117.01483497406667
+      ],
+      "missing": -51.44166176300121
+     }
+    ],
+    "meta": {
+     "trees": 120,
+     "learning_rate": 0.05,
+     "min_leaf": 250,
+     "monotone": false
+    }
+   }
+  }
+ },
+ "alerts": {
+  "delinquency": {
+   "threshold_probability": 0.09959182496795461,
+   "threshold_logit": -2.201768105738117,
+   "share_alerted_on_validation": 0.05
+  },
+  "bankruptcy": {
+   "threshold_probability": 0.038568335821861,
+   "threshold_logit": -3.215991866073389,
+   "share_alerted_on_validation": 0.02
+  }
+ },
+ "reasons": {
+  "max_reasons": 4,
+  "min_points": 0.02
+ },
+ "policy": {
+  "arms": [
+   "none",
+   "due_date_change",
+   "hardship_plan",
+   "limit_decrease",
+   "outreach_call"
+  ],
+  "eligibility": {
+   "due_date_change": [
+    {
+     "feature": "payroll_gap_days",
+     "op": "<=",
+     "value": 0.0
+    }
+   ],
+   "hardship_plan": [
+    {
+     "feature": "statement_balance",
+     "op": ">=",
+     "value": 200.0
+    }
+   ],
+   "limit_decrease": [
+    {
+     "feature": "open_to_buy",
+     "op": ">=",
+     "value": 200.0
+    }
+   ],
+   "outreach_call": []
+  },
+  "pilot_support": [
+   [
+    {
+     "feature": "od_count_3m",
+     "op": ">=",
+     "value": 1.0
+    }
+   ],
+   [
+    {
+     "feature": "payroll_gap_days",
+     "op": ">",
+     "value": 0.0
+    }
+   ],
+   [
+    {
+     "feature": "utilization",
+     "op": ">=",
+     "value": 0.5
+    },
+    {
+     "feature": "min_pay_months_6m",
+     "op": ">=",
+     "value": 2.0
+    }
+   ],
+   [
+    {
+     "feature": "cash_adv_months_6m",
+     "op": ">=",
+     "value": 1.0
+    }
+   ],
+   [
+    {
+     "feature": "util_change_3m",
+     "op": ">=",
+     "value": 0.15
+    }
+   ]
+  ],
+  "min_gain": 50.0,
+  "adverse_actions": [
+   "limit_decrease"
+  ],
+  "value_horizon_months": 18
+ },
+ "drift_reference": {
+  "features": {
+   "payroll_gap_days": {
+    "edges": [
+     0.0
+    ],
+    "shares": [
+     0.5555251072689051,
+     0.006760745741888853,
+     0.43771414698920597
+    ]
+   },
+   "payroll_amt_ratio_3m": {
+    "edges": [
+     1.0
+    ],
+    "shares": [
+     0.5249662667723569,
+     0.04438501919774691,
+     0.43064871402989613
+    ]
+   },
+   "payroll_missed_cycles_3m": {
+    "edges": [
+     0.0
+    ],
+    "shares": [
+     0.5418828443931115,
+     0.02674136101389116,
+     0.43137579459299735
+    ]
+   },
+   "inflow_ratio_3m": {
+    "edges": [
+     0.9797999858856201,
+     1.0,
+     1.042099952697754
+    ],
+    "shares": [
+     0.0686986913162917,
+     0.4904697884538871,
+     0.008647109057793097,
+     0.06736591463485658,
+     0.3648184965371715
+    ]
+   },
+   "transfer_in_share_3m": {
+    "edges": [
+     0.0,
+     1.0
+    ],
+    "shares": [
+     0.5782289028624046,
+     0.2223309369101283,
+     0.0,
+     0.1994401602274671
+    ]
+   },
+   "buffer_days": {
+    "edges": [
+     7.081559991836548,
+     14.58430004119873,
+     23.782489395141603,
+     36.47486038208008,
+     52.48674964904785,
+     60.0452995300293,
+     62.71501007080079,
+     64.65683898925782,
+     67.10186843872071
+    ],
+    "shares": [
+     0.12326038618645019,
+     0.09938565983787206,
+     0.08829798777695425,
+     0.0815090416085033,
+     0.07379377273276233,
+     0.068137134996055,
+     0.06679761473435504,
+     0.06600800279061612,
+     0.06610609123083214,
+     0.06726414787813247,
+     0.1994401602274671
+    ]
+   },
+   "buffer_days_change_6m": {
+    "edges": [
+     -7.472869873046875,
+     -3.4783999919891357,
+     -1.642699956893921,
+     -0.5730999708175659,
+     0.03319999948143959,
+     0.7567999958992004,
+     2.026099920272827,
+     4.2571001052856445,
+     9.003339767456069
+    ],
+    "shares": [
+     0.09756366706085959,
+     0.0809658768708071,
+     0.07760144337139778,
+     0.07585424303005,
+     0.07842845153296905,
+     0.0754943810650075,
+     0.07627970163948697,
+     0.07625395342393027,
+     0.07780375077934332,
+     0.08431437099868132,
+     0.1994401602274671
+    ]
+   },
+   "min_balance_ratio_3m": {
+    "edges": [
+     0.06949999928474426,
+     0.2736000120639801,
+     0.49900001287460327,
+     0.7840999960899353,
+     1.0649000406265259,
+     1.2757999897003174,
+     1.4729000329971313,
+     1.6226999759674072,
+     1.794700026512146
+    ],
+    "shares": [
+     0.17388750849844375,
+     0.07784359920818107,
+     0.07262222892493231,
+     0.07109450146856787,
+     0.06997077577534314,
+     0.06850374054136237,
+     0.06758232225608317,
+     0.0664763750926476,
+     0.06612938723538345,
+     0.06644940077158819,
+     0.1994401602274671
+    ]
+   },
+   "od_count_3m": {
+    "edges": [
+     0.0
+    ],
+    "shares": [
+     0.6982719882097694,
+     0.10228785156276342,
+     0.1994401602274671
+    ]
+   },
+   "od_months_6m": {
+    "edges": [
+     0.0
+    ],
+    "shares": [
+     0.6636860041896026,
+     0.1368738355829304,
+     0.1994401602274671
+    ]
+   },
+   "neg_days_3m": {
+    "edges": [
+     0.0
+    ],
+    "shares": [
+     0.679611275511424,
+     0.12094856426110898,
+     0.1994401602274671
+    ]
+   },
+   "stl_months_6m": {
+    "edges": [
+     0.0
+    ],
+    "shares": [
+     0.7981260203496731,
+     0.002433819422859879,
+     0.1994401602274671
+    ]
+   },
+   "ext_debt_pay_ratio_3m": {
+    "edges": [
+     0.0,
+     0.006599999964237213,
+     0.01269999984651804,
+     0.019099999219179153,
+     0.02710000053048134,
+     0.03799999877810478,
+     0.054999999701976776,
+     0.09149999916553497
+    ],
+    "shares": [
+     0.1487872896999168,
+     0.034810361327161116,
+     0.06042309222581675,
+     0.06208385212922416,
+     0.06141439852474986,
+     0.06275698405020656,
+     0.06369434170702086,
+     0.06457529851071095,
+     0.06933320091393905,
+     0.37212118091125385
+    ]
+   },
+   "ext_debt_pay_change_3m": {
+    "edges": [
+     1.0
+    ],
+    "shares": [
+     0.782131474066949,
+     0.018428365705583868,
+     0.1994401602274671
+    ]
+   },
+   "disc_spend_ratio_3m": {
+    "edges": [
+     0.8374000191688538,
+     0.8970999717712402,
+     0.9380999803543091,
+     0.9725000262260437,
+     1.003499984741211,
+     1.0363999605178833,
+     1.0733000040054321,
+     1.1194000244140625,
+     1.190600037574768
+    ],
+    "shares": [
+     0.11691590326272805,
+     0.09789287638833459,
+     0.09630690892059189,
+     0.09527698029832372,
+     0.09715966529771987,
+     0.09448123782707131,
+     0.094750367984914,
+     0.09540326916510185,
+     0.09645649379192131,
+     0.10708376323657522,
+     0.008272533826718187
+    ]
+   },
+   "utilization": {
+    "edges": [
+     0.16290000081062317,
+     0.2013999968767166,
+     0.2378000020980835,
+     0.2791999876499176,
+     0.32839998602867126,
+     0.38920000195503235,
+     0.46639999747276306,
+     0.5723000168800354,
+     0.7799000144004822
+    ],
+    "shares": [
+     0.0869854418363137,
+     0.08878965608353702,
+     0.08905939929413106,
+     0.09012427192322618,
+     0.0922319472823678,
+     0.09432613548097973,
+     0.097384042604714,
+     0.10182560978824545,
+     0.11361338809120508,
+     0.14566010761527998,
+     0.0
+    ]
+   },
+   "util_change_3m": {
+    "edges": [
+     -0.053599998354911804,
+     -0.03180000185966492,
+     -0.019200000911951065,
+     -0.009800000116229057,
+     -0.001500000013038516,
+     0.00570000009611249,
+     0.01510000042617321,
+     0.02810000069439411,
+     0.052000001072883606
+    ],
+    "shares": [
+     0.11409831281752301,
+     0.09747293525365977,
+     0.09422130346049887,
+     0.09346602247083555,
+     0.09335322076458713,
+     0.09624621669820824,
+     0.09399753920625609,
+     0.09468661049877358,
+     0.09797441240426415,
+     0.12448342642539363,
+     0.0
+    ]
+   },
+   "util_change_6m": {
+    "edges": [
+     -0.05429999902844429,
+     -0.032499998807907104,
+     -0.019099999219179153,
+     -0.008700000122189522,
+     0.0,
+     0.00839999970048666,
+     0.018699999898672104,
+     0.032999999821186066,
+     0.06040000170469284
+    ],
+    "shares": [
+     0.11066521740996248,
+     0.09675382437632611,
+     0.09344763088829504,
+     0.09357882417708396,
+     0.09877812456128413,
+     0.09219945548654625,
+     0.09254337808005365,
+     0.09394236445863458,
+     0.09646446347768886,
+     0.13162671708412493,
+     0.0
+    ]
+   },
+   "pay_ratio_3m": {
+    "edges": [
+     0.20749999582767487,
+     0.313400000333786,
+     0.4221999943256378,
+     0.5831000208854675,
+     0.9086999893188477,
+     1.0
+    ],
+    "shares": [
+     0.1442139161748451,
+     0.10088947823693385,
+     0.09940405142041257,
+     0.1014908829860083,
+     0.10804257773968677,
+     0.44595909344211343,
+     0.0,
+     0.0
+    ]
+   },
+   "pay_to_min_3m": {
+    "edges": [
+     7.730599880218506,
+     12.261500358581543,
+     16.550399780273438,
+     20.0
+    ],
+    "shares": [
+     0.14468903205714143,
+     0.10034079602447551,
+     0.09719399625179548,
+     0.6577761756665876,
+     0.0,
+     0.0
+    ]
+   },
+   "min_pay_months_6m": {
+    "edges": [
+     0.0
+    ],
+    "shares": [
+     0.9341397429224593,
+     0.06586025707754076,
+     0.0
+    ]
+   },
+   "pay_ratio_drift": {
+    "edges": [
+     -0.04360000044107437,
+     -0.012600000016391277,
+     0.0,
+     0.013500000350177288,
+     0.04230000078678131
+    ],
+    "shares": [
+     0.1288029961114064,
+     0.10547511281703256,
+     0.46249619140978226,
+     0.0905626046404415,
+     0.10325463575164252,
+     0.10940845926969478,
+     0.0
+    ]
+   },
+   "cash_adv_to_limit_3m": {
+    "edges": [
+     0.0
+    ],
+    "shares": [
+     0.9917293053315359,
+     0.008270694668464137,
+     0.0
+    ]
+   },
+   "cash_adv_months_6m": {
+    "edges": [
+     0.0
+    ],
+    "shares": [
+     0.9841102857377568,
+     0.015889714262243122,
+     0.0
+    ]
+   },
+   "late_fee_count_6m": {
+    "edges": [
+     0.0
+    ],
+    "shares": [
+     0.9129477354137892,
+     0.08705226458621085,
+     0.0
+    ]
+   },
+   "card_spend_ratio_3m": {
+    "edges": [
+     0.8913999795913696,
+     0.932699978351593,
+     0.9595999717712402,
+     0.9812999963760376,
+     1.000599980354309,
+     1.0211999416351318,
+     1.044600009918213,
+     1.0743000507354736,
+     1.121999979019165
+    ],
+    "shares": [
+     0.13104922139235314,
+     0.09627748238852708,
+     0.09389638550228331,
+     0.09340165193194379,
+     0.09450146856786586,
+     0.09244406353433494,
+     0.0930748948154742,
+     0.09347583131485715,
+     0.09553323634838808,
+     0.1162605498715348,
+     8.521433243766327e-05
+    ]
+   },
+   "max_cpd_12m": {
+    "edges": [
+     0.0
+    ],
+    "shares": [
+     0.9122862514950824,
+     0.0877137485049176,
+     0.0
+    ]
+   },
+   "statement_balance": {
+    "edges": [
+     910.63,
+     1204.31,
+     1477.59,
+     1768.9,
+     2099.65,
+     2509.95,
+     3068.46,
+     3932.8540000000003,
+     5600.203999999999
+    ],
+    "shares": [
+     0.08886506157195308,
+     0.08975582721966477,
+     0.09210320620458429,
+     0.09352119721845706,
+     0.09517766575260501,
+     0.09580788398099291,
+     0.09986935845868729,
+     0.10442740566497526,
+     0.11242713101734265,
+     0.12804526291073767,
+     0.0
+    ]
+   },
+   "open_to_buy": {
+    "edges": [
+     1032.7060000000001,
+     1802.9260000000002,
+     2492.3340000000007,
+     3163.612,
+     3888.8,
+     4722.968000000002,
+     5725.5,
+     7106.2339999999995,
+     9351.152
+    ],
+    "shares": [
+     0.14203512669654686,
+     0.10604893019229626,
+     0.09979579212852528,
+     0.09717192635274688,
+     0.09552404055711781,
+     0.09436353169881209,
+     0.09268315410736147,
+     0.09175131392530933,
+     0.09071035035351686,
+     0.08991583398776715,
+     0.0
+    ]
+   }
+  },
+  "scores": {
+   "delinquency": {
+    "edges": [
+     -7.424538783085516,
+     -7.192424866322479,
+     -6.808748866313662,
+     -6.194434851530692,
+     -5.641833503369851,
+     -5.4405339040039955,
+     -5.2316891603938105,
+     -4.8949436938191875,
+     -4.126191028591182
+    ],
+    "shares": [
+     0.08401336209776843,
+     0.08428433141386517,
+     0.08545648827444655,
+     0.08935672987853586,
+     0.09631855692286755,
+     0.09010404118243162,
+     0.09247839448841054,
+     0.09829749120422565,
+     0.11236582574220765,
+     0.167324778795241,
+     0.0
+    ]
+   },
+   "bankruptcy": {
+    "edges": [
+     -7.208006948752136,
+     -7.130446287392187,
+     -7.047242888698527,
+     -6.9434294286364295,
+     -6.811217507568877,
+     -6.628924251897628,
+     -6.492019835615647,
+     -6.315611988680242,
+     -5.802432032752261
+    ],
+    "shares": [
+     0.10387504513600881,
+     0.08801904877508995,
+     0.09154716735910975,
+     0.09293082741890692,
+     0.08877432976475327,
+     0.09262184883222646,
+     0.08991092956575635,
+     0.09167100401488247,
+     0.10391182830108982,
+     0.1567379708321762,
+     0.0
+    ]
+   }
+  }
+ }
+}

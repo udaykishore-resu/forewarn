@@ -1,0 +1,28 @@
+# kubectl apply -k deploy/k8s
+#
+# Before applying:
+#   1. copy the approved bundle next to this file as bundle.json
+#   2. put its SHA-256 (artifacts/bundle/bundle.sha256) in the literal below
+#   3. point the image at your registry
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: forewarn
+resources:
+  - namespace.yaml
+  - serviceaccount.yaml
+  - deployment.yaml
+  - service.yaml
+  - networkpolicy.yaml
+  - pdb.yaml
+  # - cronjob-batch.yaml   # needs the two PersistentVolumeClaims it mounts
+configMapGenerator:
+  - name: forewarn-bundle
+    files:
+      - bundle.json
+  - name: forewarn-bundle-digest
+    literals:
+      - sha256=REPLACE_WITH_BUNDLE_SHA256
+images:
+  - name: forewarn-scorer
+    newName: forewarn-scorer
+    newTag: 0.1.0

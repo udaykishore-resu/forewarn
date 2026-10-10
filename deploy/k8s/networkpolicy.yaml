@@ -1,0 +1,30 @@
+# Nothing leaves the namespace: every pod is denied all egress, including DNS,
+# because the scorer resolves and calls nothing. Ingress is limited to
+# namespaces the bank labels as callers.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: forewarn
+spec:
+  podSelector: {}
+  policyTypes: ["Ingress", "Egress"]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-scoring-clients
+  namespace: forewarn
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: forewarn-scorer
+  policyTypes: ["Ingress"]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              forewarn.io/client: "true"
+      ports:
+        - protocol: TCP
+          port: 8080

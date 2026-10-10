@@ -1,0 +1,74 @@
+# Monthly book scoring. The feature file and the output location are volumes
+# the bank provides (a CSI mount of its own object store, or a PVC); nothing is
+# fetched over the network by the job itself.
+#
+# Exit status 3 means a score's distribution reached the PSI alert level, so
+# the run shows up as failed and someone looks before the scores are used.
+# Input drift is written to summary.json for diagnosis and does not fail the run.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: forewarn-batch
+  namespace: forewarn
+spec:
+  schedule: "0 6 2 * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: forewarn-batch
+        spec:
+          restartPolicy: Never
+          serviceAccountName: forewarn-scorer
+          automountServiceAccountToken: false
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            runAsGroup: 65532
+            fsGroup: 65532
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: batch
+              image: forewarn-scorer:0.1.0
+              args:
+                - batch
+                - -bundle=/bundle/bundle.json
+                - -in=/data/in/features.jsonl
+                - -out=/data/out/decisions.jsonl
+                - -audit-log=/data/out/audit.jsonl
+                - -summary=/data/out/summary.json
+                - -fail-on-drift
+              env:
+                - name: FOREWARN_BUNDLE_SHA256
+                  valueFrom:
+                    configMapKeyRef:
+                      name: forewarn-bundle-digest
+                      key: sha256
+              resources:
+                requests: {cpu: 500m, memory: 64Mi}
+                limits: {memory: 256Mi}
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              volumeMounts:
+                - {name: bundle, mountPath: /bundle, readOnly: true}
+                - {name: features, mountPath: /data/in, readOnly: true}
+                - {name: decisions, mountPath: /data/out}
+          volumes:
+            - name: bundle
+              configMap:
+                name: forewarn-bundle
+            - name: features
+              persistentVolumeClaim:
+                claimName: forewarn-features
+            - name: decisions
+              persistentVolumeClaim:
+                claimName: forewarn-decisions
